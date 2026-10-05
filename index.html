@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>LP-UNSA | Huellas fósiles 3D</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="wrap">
+    <header class="hero">
+      <p class="eyebrow">LABORATORIO DE PALEONTOLOGÍA · UNSA</p>
+      <h1>Huellas fósiles 3D</h1>
+      <p class="lead">Colección digital para visualización interactiva de icnitas fósiles.</p>
+    </header>
+    <section id="galeria" class="grid"></section>
+  </main>
+  <script type="module">
+    import { catalogo } from "./catalogo.js";
+    const galeria = document.getElementById("galeria");
+    for (const i of catalogo) {
+      const card = document.createElement("article");
+      card.className = "card";
+      card.innerHTML = `
+        <div class="visual">3D</div>
+        <div class="body">
+          <p class="codigo">${i.codigo}</p>
+          <h2>${i.titulo}</h2>
+          <p><em>${i.identificacion}</em></p>
+          <p class="meta">${i.localidad}<br>${i.unidad}<br>${i.edad}</p>
+          <a class="btn" href="visor.html?id=${encodeURIComponent(i.id)}">Ver modelo 3D</a>
+        </div>`;
+      galeria.appendChild(card);
+    }
+  </script>
+</body>
+</html>

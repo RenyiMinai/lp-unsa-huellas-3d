@@ -1,0 +1,17 @@
+INICIO LIMPIO - LP-UNSA HUELLAS 3D
+
+1. Copie el modelo comprimido dentro de:
+   modelos/HUE-001.glb
+
+2. Abra CMD en la carpeta raíz y ejecute:
+   py -m http.server 8000
+
+3. Abra:
+   http://localhost:8000
+
+4. Pulse "Ver modelo 3D".
+
+El visor acepta GLB normal, Draco y Meshopt.
+
+Para GitHub Pages, index.html, visor.html, catalogo.js y styles.css
+deben estar directamente en la raíz del repositorio.

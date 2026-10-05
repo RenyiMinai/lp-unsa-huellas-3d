@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+  <title>Visor 3D | LP-UNSA</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="viewer">
+<div class="stage">
+  <canvas id="c"></canvas>
+  <div class="top">
+    <div class="panel">
+      <h1 id="titulo">Cargando…</h1>
+      <p id="meta"></p>
+    </div>
+    <div class="actions">
+      <button id="reset">Recentrar</button>
+      <a href="index.html">Volver</a>
+    </div>
+  </div>
+  <div id="status" class="status">Cargando modelo…</div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.166.1/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
+import { TrackballControls } from "three/addons/controls/TrackballControls.js";
+import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
+import { catalogo } from "./catalogo.js";
+
+const canvas = document.getElementById("c");
+const status = document.getElementById("status");
+const id = new URLSearchParams(location.search).get("id");
+const item = catalogo.find(x => x.id === id) || catalogo[0];
+
+document.getElementById("titulo").textContent = `${item.codigo} · ${item.titulo}`;
+document.getElementById("meta").textContent = `${item.identificacion} · ${item.localidad}`;
+
+const renderer = new THREE.WebGLRenderer({canvas, antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.NoToneMapping;
+renderer.setClearColor(0xe9e6df);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(38,1,.001,100000);
+camera.position.set(0,0,5);
+
+const controls = new TrackballControls(camera,renderer.domElement);
+controls.rotateSpeed=.55;
+controls.zoomSpeed=.75;
+controls.panSpeed=.22;
+controls.dynamicDampingFactor=.18;
+controls.staticMoving=false;
+
+let saved = null;
+
+function unlit(root){
+  root.traverse(o=>{
+    if(!o.isMesh) return;
+    const conv = m => {
+      if(m?.map){m.map.colorSpace=THREE.SRGBColorSpace;m.map.needsUpdate=true;}
+      return new THREE.MeshBasicMaterial({
+        map:m?.map || null,
+        color:m?.map ? 0xffffff : 0xf5f2ea,
+        side:THREE.DoubleSide,
+        transparent:!!m?.transparent,
+        opacity:m?.opacity ?? 1,
+        alphaTest:m?.alphaTest ?? 0
+      });
+    };
+    o.material = Array.isArray(o.material) ? o.material.map(conv) : conv(o.material);
+  });
+}
+
+function fit(obj){
+  const box=new THREE.Box3().setFromObject(obj);
+  const center=box.getCenter(new THREE.Vector3());
+  const size=box.getSize(new THREE.Vector3());
+  obj.position.sub(center);
+  const max=Math.max(size.x,size.y,size.z);
+  const dist=(max/2)/Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*1.5;
+  camera.position.set(dist*.55,dist*.42,dist);
+  camera.near=Math.max(dist/1000,.001);
+  camera.far=dist*100;
+  camera.updateProjectionMatrix();
+  controls.target.set(0,0,0);
+  controls.update();
+  saved={p:camera.position.clone(),t:controls.target.clone(),u:camera.up.clone()};
+}
+
+const draco = new DRACOLoader();
+draco.setDecoderPath("https://www.gstatic.com/draco/versioned/decoders/1.5.7/");
+
+const loader = new GLTFLoader();
+loader.setDRACOLoader(draco);
+loader.setMeshoptDecoder(MeshoptDecoder);
+
+loader.load(
+  item.modelo,
+  gltf=>{
+    const model=gltf.scene;
+    unlit(model);
+    scene.add(model);
+    fit(model);
+    status.textContent="Modelo listo";
+    setTimeout(()=>status.classList.add("hidden"),800);
+  },
+  xhr=>{
+    if(xhr.total){
+      status.textContent=`Cargando modelo… ${Math.round(xhr.loaded/xhr.total*100)}%`;
+    }
+  },
+  err=>{
+    console.error(err);
+    status.textContent="No se pudo cargar el modelo. Revise el archivo y la consola del navegador.";
+  }
+);
+
+document.getElementById("reset").onclick=()=>{
+  if(!saved)return;
+  camera.position.copy(saved.p);
+  camera.up.copy(saved.u);
+  controls.target.copy(saved.t);
+  controls.update();
+};
+
+function resize(){
+  const w=canvas.clientWidth,h=canvas.clientHeight;
+  renderer.setSize(w,h,false);
+  camera.aspect=w/h;
+  camera.updateProjectionMatrix();
+}
+addEventListener("resize",resize);
+resize();
+
+(function animate(){
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene,camera);
+})();
+</script>
+</body>
+</html>
