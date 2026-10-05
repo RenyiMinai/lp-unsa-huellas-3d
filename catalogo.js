@@ -8,5 +8,16 @@ export const catalogo = [
     unidad: "Formación Hualhuani",
     edad: "Cretácico Inferior",
     modelo: "modelos/HUE-001.glb"
+  },
+
+  {
+    id: "HUE-002",
+    codigo: "HUE-002",
+    titulo: "Huella fósil 02",
+    identificacion: "Icnita indeterminada",
+    localidad: "Querullpa, Castilla, Arequipa, Perú",
+    unidad: "Formación Hualhuani",
+    edad: "Cretácico Inferior",
+    modelo: "modelos/HUE-002.glb"
   }
 ];
