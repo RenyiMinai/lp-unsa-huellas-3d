@@ -26,7 +26,7 @@ export const catalogo = [
   codigo: "HUE-003",
   titulo: "Huella fósil 03",
   identificacion: "Icnita - Theropoda indet",
-  localidad: "Tipan, Castilla, Arequipa, Perú",
+  localidad: "Querulpa, Aplao, Castilla, Arequipa, Perú",
   unidad: "Formación Hualhuani",
   edad: "Cretácico Inferior",
   modelo: "modelos/HUE-003.glb"
