@@ -3,33 +3,110 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Colección digital 3D de huellas fósiles del Laboratorio de Paleontología de la UNSA.">
   <title>LP-UNSA | Huellas fósiles 3D</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <header class="site-header">
+    <div class="hero-decoration" aria-hidden="true"></div>
+    <div class="wrap hero">
+      <div class="hero-copy">
+        <p class="eyebrow">LABORATORIO DE PALEONTOLOGÍA · UNSA</p>
+        <h1>Huellas fósiles <span>3D</span></h1>
+        <p class="lead">Colección digital para la visualización interactiva de icnitas fósiles del sur del Perú.</p>
+        <div class="hero-meta">
+          <span id="contador-modelos" class="pill"></span>
+          <span class="pill pill-soft">Colección digital</span>
+        </div>
+      </div>
+      <div class="hero-mark" aria-hidden="true">
+        <div class="track-mark">
+          <span class="toe toe-1"></span><span class="toe toe-2"></span><span class="toe toe-3"></span><span class="pad"></span>
+        </div>
+      </div>
+    </div>
+  </header>
+
   <main class="wrap">
-    <header class="hero">
-      <p class="eyebrow">LABORATORIO DE PALEONTOLOGÍA · UNSA</p>
-      <h1>Huellas fósiles 3D</h1>
-      <p class="lead">Colección digital para visualización interactiva de icnitas fósiles.</p>
-    </header>
-    <section id="galeria" class="grid"></section>
+    <section class="section-heading">
+      <div>
+        <p class="section-kicker">MODELOS DISPONIBLES</p>
+        <h2>Colección interactiva</h2>
+      </div>
+      <p>Seleccione un ejemplar para rotarlo, ampliarlo y explorar su relieve superficial.</p>
+    </section>
+
+    <section id="galeria" class="grid" aria-label="Modelos 3D de huellas fósiles"></section>
+
+    <section class="info-strip">
+      <div><strong>Visualización 3D</strong><span>Rotación, zoom y desplazamiento libre.</span></div>
+      <div><strong>Registro digital</strong><span>Modelos derivados de levantamientos fotogramétricos.</span></div>
+      <div><strong>LP-UNSA</strong><span>Laboratorio de Paleontología · Universidad Nacional de San Agustín.</span></div>
+    </section>
   </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>Laboratorio de Paleontología · UNSA</p>
+      <p>Colección de huellas fósiles 3D</p>
+    </div>
+  </footer>
+
   <script type="module">
-    import { catalogo } from "./catalogo.js";
+    import { catalogo } from "./catalogo.js?v=3";
+
     const galeria = document.getElementById("galeria");
+    const contador = document.getElementById("contador-modelos");
+    contador.textContent = `${catalogo.length} ${catalogo.length === 1 ? "modelo" : "modelos"} disponibles`;
+
     for (const i of catalogo) {
       const card = document.createElement("article");
       card.className = "card";
+      const miniatura = `miniaturas/${i.id}.jpg`;
+
       card.innerHTML = `
-        <div class="visual">3D</div>
-        <div class="body">
-          <p class="codigo">${i.codigo}</p>
-          <h2>${i.titulo}</h2>
-          <p><em>${i.identificacion}</em></p>
-          <p class="meta">${i.localidad}<br>${i.unidad}<br>${i.edad}</p>
-          <a class="btn" href="visor.html?id=${encodeURIComponent(i.id)}">Ver modelo 3D</a>
+        <div class="card-visual">
+          <img src="${miniatura}" alt="Miniatura del modelo ${i.codigo}" class="thumb" loading="lazy">
+          <div class="thumb-fallback" aria-hidden="true">
+            <div class="fallback-track">
+              <span class="f-toe f1"></span><span class="f-toe f2"></span><span class="f-toe f3"></span><span class="f-pad"></span>
+            </div>
+          </div>
+          <span class="badge-3d">3D</span>
+        </div>
+
+        <div class="card-body">
+          <div class="card-heading">
+            <p class="code">${i.codigo}</p>
+            <span class="status-dot">Disponible</span>
+          </div>
+
+          <h3>${i.titulo}</h3>
+          <p class="identification">${i.identificacion}</p>
+
+          <dl class="metadata">
+            <div><dt>Localidad</dt><dd>${i.localidad}</dd></div>
+            <div><dt>Unidad</dt><dd>${i.unidad}</dd></div>
+            <div><dt>Edad</dt><dd>${i.edad}</dd></div>
+          </dl>
+
+          <a class="btn" href="visor.html?id=${encodeURIComponent(i.id)}">
+            <span>Explorar modelo</span><span aria-hidden="true">→</span>
+          </a>
         </div>`;
+
+      const img = card.querySelector(".thumb");
+      const fallback = card.querySelector(".thumb-fallback");
+      img.addEventListener("load", () => {
+        img.classList.add("loaded");
+        fallback.classList.add("hidden");
+      });
+      img.addEventListener("error", () => {
+        img.remove();
+        fallback.classList.remove("hidden");
+      });
+
       galeria.appendChild(card);
     }
   </script>
