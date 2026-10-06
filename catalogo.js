@@ -14,8 +14,8 @@ export const catalogo = [
     id: "HUE-002",
     codigo: "HUE-002",
     titulo: "Huella fósil 02",
-    identificacion: "Icnita indeterminada",
-    localidad: "Querullpa, Castilla, Arequipa, Perú",
+    identificacion: "Icnita - Sauropodo indet.",
+    localidad: "Tipan, Castilla, Arequipa, Perú",
     unidad: "Formación Hualhuani",
     edad: "Cretácico Inferior",
     modelo: "modelos/HUE-002.glb"
