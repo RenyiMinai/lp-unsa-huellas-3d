@@ -19,5 +19,16 @@ export const catalogo = [
     unidad: "Formación Hualhuani",
     edad: "Cretácico Inferior",
     modelo: "modelos/HUE-002.glb"
-  }
+  },
+
+{
+  id: "HUE-003",
+  codigo: "HUE-003",
+  titulo: "Huella fósil 03",
+  identificacion: "Icnita - Theropoda indet",
+  localidad: "Tipan, Castilla, Arequipa, Perú",
+  unidad: "Formación Hualhuani",
+  edad: "Cretácico Inferior",
+  modelo: "modelos/HUE-003.glb"
+}
 ];
