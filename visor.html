@@ -1,25 +1,25 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-  <title>Visor 3D | LP-UNSA</title>
-  <link rel="stylesheet" href="styles.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Visor 3D | LP-UNSA</title>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body class="viewer">
 <div class="stage">
-  <canvas id="c"></canvas>
-  <div class="top">
-    <div class="panel">
-      <h1 id="titulo">Cargando…</h1>
-      <p id="meta"></p>
-    </div>
-    <div class="actions">
-      <button id="reset">Recentrar</button>
-      <a href="index.html">Volver</a>
-    </div>
+<canvas id="c"></canvas>
+<div class="top">
+  <div class="panel">
+    <h1 id="titulo">Cargando…</h1>
+    <p id="meta"></p>
   </div>
-  <div id="status" class="status">Cargando modelo…</div>
+  <div class="actions">
+    <button id="reset">Recentrar</button>
+    <a href="index.html">Volver</a>
+  </div>
+</div>
+<div id="status" class="status">Cargando modelo…</div>
 </div>
 
 <script type="importmap">
@@ -64,23 +64,23 @@ controls.panSpeed=.22;
 controls.dynamicDampingFactor=.18;
 controls.staticMoving=false;
 
-let saved = null;
+let saved=null;
 
 function unlit(root){
   root.traverse(o=>{
     if(!o.isMesh) return;
-    const conv = m => {
+    const conv=m=>{
       if(m?.map){m.map.colorSpace=THREE.SRGBColorSpace;m.map.needsUpdate=true;}
       return new THREE.MeshBasicMaterial({
-        map:m?.map || null,
-        color:m?.map ? 0xffffff : 0xf5f2ea,
+        map:m?.map||null,
+        color:m?.map?0xffffff:0xf5f2ea,
         side:THREE.DoubleSide,
         transparent:!!m?.transparent,
-        opacity:m?.opacity ?? 1,
-        alphaTest:m?.alphaTest ?? 0
+        opacity:m?.opacity??1,
+        alphaTest:m?.alphaTest??0
       });
     };
-    o.material = Array.isArray(o.material) ? o.material.map(conv) : conv(o.material);
+    o.material=Array.isArray(o.material)?o.material.map(conv):conv(o.material);
   });
 }
 
@@ -100,16 +100,21 @@ function fit(obj){
   saved={p:camera.position.clone(),t:controls.target.clone(),u:camera.up.clone()};
 }
 
-const draco = new DRACOLoader();
-draco.setDecoderPath("https://www.gstatic.com/draco/versioned/decoders/1.5.7/");
+const draco=new DRACOLoader();
+draco.setDecoderPath("https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/libs/draco/gltf/");
+draco.setWorkerLimit(1);
+draco.preload();
 
-const loader = new GLTFLoader();
+const loader=new GLTFLoader();
 loader.setDRACOLoader(draco);
 loader.setMeshoptDecoder(MeshoptDecoder);
+
+console.log("Cargando:",item.modelo);
 
 loader.load(
   item.modelo,
   gltf=>{
+    console.log("Modelo cargado correctamente:",item.id);
     const model=gltf.scene;
     unlit(model);
     scene.add(model);
@@ -123,13 +128,13 @@ loader.load(
     }
   },
   err=>{
-    console.error(err);
-    status.textContent="No se pudo cargar el modelo. Revise el archivo y la consola del navegador.";
+    console.error("ERROR AL CARGAR GLB:",err);
+    status.textContent="No se pudo cargar el modelo. Revise la consola del navegador.";
   }
 );
 
 document.getElementById("reset").onclick=()=>{
-  if(!saved)return;
+  if(!saved) return;
   camera.position.copy(saved.p);
   camera.up.copy(saved.u);
   controls.target.copy(saved.t);
